@@ -42,23 +42,29 @@ def display_archives_labels(archives_path):
         )
 
 
-def get_frame_counts_tree(archives_path):
+def get_frame_counts_tree(archives_path, targets_count):
+    # get archive names
     archive_names = os.listdir(archives_path)
+    # process each one
     for archive_name in archive_names:
         with zipfile.ZipFile(f"{archives_path}/{archive_name}", 'r') as z:
+            # get paths of targets for specific archive
             label_names = list(set([os.path.dirname(frame) for frame in z.namelist()]))
             label_names.sort()
             print(f"Archive {archive_name}:")
+            # init counter for samples
             label_counts = []
             for label_name in label_names:
                 label_counts.append(len([frame for frame in z.namelist() if label_name in frame]))
                 print(f"Length of {label_name}:\t{label_counts[-1]}")
-            test_label_counts = np.array(label_counts[:7])
-            train_label_counts = np.array(label_counts[7:])
+            # init counter for test/train samples
+            test_label_counts = np.array(label_counts[:targets_count])
+            train_label_counts = np.array(label_counts[targets_count:])
+            # display ratio of test target samples from all target samples
             if archive_name != 'rating-opencv-emotion-images.zip':
-                print(test_label_counts/train_label_counts)
+                print(test_label_counts/(test_label_counts + train_label_counts))
             else:
-                print(train_label_counts/test_label_counts)
+                print(train_label_counts/(test_label_counts + train_label_counts))
             print()
 
 
@@ -66,7 +72,7 @@ if __name__ == "__main__":
     # common labels: angry, disgust, fear, happy, neutral, sad, surprise
     # display_archives_labels(ARCHIVES_PATH)
 
-    # emotion-detection-fer.zip - ~0.25
-    # fer2013.zip - ~0.25
-    # rating-opencv-emotion-images.zip - ~0.125
-    get_frame_counts_tree(ARCHIVES_PATH)
+    # emotion-detection-fer.zip - ~0.2
+    # fer2013.zip - ~0.2
+    # rating-opencv-emotion-images.zip - ~0.11
+    get_frame_counts_tree(ARCHIVES_PATH, targets_count=7)
