@@ -1,3 +1,5 @@
-venv
-res
 .idea
+venv
+.env
+
+data/archive
