@@ -1,18 +1,18 @@
 import os
+from pathlib import Path
 import pandas as pd
 
 
-TABLE_PATH = f"../data/prepared"
-DATASET_PATH = f"../data/raw"
+REPO_DIR = Path(__file__).parent.parent
 
 
-def get_files_and_labels(source_path):
+def get_files_and_labels(sample_path):
     images = []
     labels = []
-    for label in os.listdir(source_path):
-        paths = [f"{source_path}/{label}/{image}" for image in os.listdir(f"{source_path}/{label}")]
-        images.extend(paths)
-        labels.extend([label for _ in range(len(paths))])
+    for labels_paths in sample_path.iterdir():
+        for label_path in labels_paths.iterdir():
+            images.append(str(label_path).split(str(REPO_DIR))[-1].replace('\\', '/')[1:])
+            labels.append(str(label_path).split(os.path.sep)[-2])
     return images, labels
 
 
@@ -23,11 +23,11 @@ def save_as_csv(filenames, labels, destination):
 
 
 def main():
-    samples = list(filter(lambda file_or_dir: os.path.isdir(f"{DATASET_PATH}/{file_or_dir}"),
-                          os.listdir(DATASET_PATH)))
-    for sample in samples:
-        files_paths, files_labels = get_files_and_labels(f"{DATASET_PATH}/{sample}")
-        save_as_csv(files_paths, files_labels, f"{TABLE_PATH}/{sample}.csv")
+    for filesys_obj in (REPO_DIR / 'data/raw').iterdir():
+        if filesys_obj.is_dir():
+            files_paths, files_labels = get_files_and_labels(filesys_obj)
+            sample = str(filesys_obj).split(os.path.sep)[-1]
+            save_as_csv(files_paths, files_labels, REPO_DIR / f"data/prepared/{sample}.csv")
 
 
 if __name__ == "__main__":
