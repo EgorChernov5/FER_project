@@ -1,11 +1,10 @@
 import tensorflow as tf
-from tqdm import tqdm
 import pandas as pd
 import numpy as np
 from pathlib import Path
 import os
 
-from util.util import save_as_json
+from ml.util.util import save_as_json
 
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'

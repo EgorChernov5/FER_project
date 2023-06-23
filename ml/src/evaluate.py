@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 from pathlib import Path
 from train import get_path, process_path
-from util.util import save_as_json
+from ml.util.util import save_as_json
 
 
 REPO_DIR = Path(__file__).parent.parent

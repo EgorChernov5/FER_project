@@ -4,9 +4,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from util.util import open_json, save_as_json
-from train import get_path, process_path
-
+from ml.util.util import open_json
 
 REPO_DIR = Path(__file__).parent.parent
 CLASS_NAMES = np.array(['angry', 'disgust', 'fear', 'happy', 'neutral', 'sad', 'surprise'])
