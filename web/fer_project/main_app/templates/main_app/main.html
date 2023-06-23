@@ -7,14 +7,28 @@
     <title>FER project</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="{% static 'styles/main.css' %}">
+    <script src="{% static 'js/script.js' %}"></script>
     {% load bootstrap5 %}
     {% bootstrap_css %}
     {% bootstrap_javascript %}
 </head>
 <body class="text-center">
-    {% block content %}{% endblock %}
-    <footer class="">
-        <p class="mx-auto mt-5 w-50 fs-6">If you have any questions, write to me <a href="https://t.me/chernovec">telegram</a>!</p>
+    <div class="wrapper">
+        <header>
+            {% block header %}{% endblock %}
+        </header>
+
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <footer>
+        {% block footer %}
+            <footer class="mt-5">
+                <p class="mx-auto w-50 fs-6">If you have any questions, write to me <a href="https://t.me/chernovec">telegram</a>!</p>
+            </footer>
+        {% endblock %}
     </footer>
 </body>
 </html>

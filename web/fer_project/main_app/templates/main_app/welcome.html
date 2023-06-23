@@ -1,20 +1,21 @@
 {% extends 'main_app/main.html' %}
 
-{% block content %}
-<div class="">
-    <header class="mt-5">
+{% block header %}
+    <div class="mt-5">
         <h1 class="fw-bold" style="font-size: 500%">Welcome to the FER Project!</h1>
-    </header>
+    </div>
+{% endblock %}
 
-    <main class="mt-5">
+{% block content %}
+    <div class="mt-5">
         <p class="mx-auto w-50 fs-3">FER is a project created for research purposes. It allows you to record your mood, analyze it and provide it as statistical metrics.</p>
-        <p class="mx-auto mt-5 w-50 fs-5"><spa class="text-danger">Warnings</spa>: the application uses a webcam&#128561</p>
+        <p class="danger mt-5 fs-4 fw-bold">Warning!</p>
+        <p class="mx-auto w-50 fs-5">The application uses a webcam&#128561</p>
         <div class="mt-5">
             <p class="mx-auto mt-5 w-50 fs-3">Let's get started?</p>
             <div class="d-grid col-1 mx-auto">
                 <a href="{% url 'webcam' %}"><button class="btn btn-primary" type="button">Go!</button></a>
             </div>
         </div>
-    </main>
-</div>
+    </div>
 {% endblock %}

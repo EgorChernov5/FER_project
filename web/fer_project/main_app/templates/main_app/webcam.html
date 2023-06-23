@@ -1,5 +1,10 @@
 {% extends 'main_app/main.html' %}
 
 {% block content %}
-<img src="{% url 'stream' %}">
+<div class="mx-auto rounded" style="padding-top: 5%;">
+    <img class="rounded mx-auto" src="{% url 'stream' %}">
+    <div class="d-grid col-1 mx-auto mt-5">
+        <a><button class="btn btn-primary" type="button">Record</button></a>
+    </div>
+</div>
 {% endblock %}
