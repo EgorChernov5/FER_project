@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE-edge">
+    <title>FER project</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/main.css' %}">
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+</head>
+<body class="text-center">
+    {% block content %}{% endblock %}
+    <footer class="">
+        <p class="mx-auto mt-5 w-50 fs-6">If you have any questions, write to me <a href="https://t.me/chernovec">telegram</a>!</p>
+    </footer>
+</body>
+</html>
