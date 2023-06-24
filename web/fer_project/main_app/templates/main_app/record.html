@@ -1,0 +1,19 @@
+{% extends 'main_app/main.html' %}
+{% load static %}
+
+{% block content %}
+<div class="display-cover mt-5">
+    <p id="timer" class="fs-5 fw-bold">0h 0m 0s</p>
+    <video autoplay class="rounded"></video>
+    <canvas class="d-none"></canvas>
+
+    <img class="d-none" alt="">
+
+    <div class="mt-5">
+        <button id="start_button" class="btn btn-danger" onclick="recordStream()">Record</button>
+        <a href="{% url 'result' %}"><button id="result_button" class="btn btn-info d-none" onclick="getResult()">Results</button></a>
+        <button id="stop_button" class="btn btn-info d-none" onclick="stopRecordStream()">Stop</button>
+    </div>
+</div>
+
+{% endblock %}
