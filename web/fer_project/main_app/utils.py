@@ -7,6 +7,7 @@ import io
 
 
 faceCascade = cv2.CascadeClassifier('static/model/haarcascade_frontalface_default.xml')
+model = tf.keras.models.load_model("static/model/model.h5")
 CLASS_NAMES = np.array(['angry', 'disgust', 'fear', 'happy', 'neutral', 'sad', 'surprise'])
 
 
@@ -69,7 +70,6 @@ def get_predict(image):
     Return:
          Predict (str).
     """
-    model = tf.keras.models.load_model("static/model/model.h5")
     y_pred = model.predict(tf.convert_to_tensor(image))
     predict = CLASS_NAMES[np.argmax(y_pred[0])]
     return predict

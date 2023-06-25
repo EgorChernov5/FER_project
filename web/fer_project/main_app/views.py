@@ -21,9 +21,12 @@ def record(request):
 def predict(request):
     response = None
     if request.method == 'POST':
-        img = decode_image(request.body)
-        img = preprocess_image(img)
-        if img is not None:
-            response = get_predict(img)
+        try:
+            img = decode_image(request.body)
+            img = preprocess_image(img)
+            if img is not None:
+                response = get_predict(img)
+        except:
+            print("Error")
 
     return HttpResponse(response)
