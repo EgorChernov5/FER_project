@@ -72,16 +72,16 @@ def create_model():
         tf.keras.layers.Conv2D(filters=11,
                                kernel_size=(3, 3),
                                activation='relu'),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Conv2D(filters=11,
-                               kernel_size=(3, 3),
-                               activation='relu'),
-        tf.keras.layers.Conv2D(filters=11,
-                               kernel_size=(3, 3),
-                               activation='relu'),
-        tf.keras.layers.Conv2D(filters=11,
-                               kernel_size=(3, 3),
-                               activation='relu'),
+        # tf.keras.layers.BatchNormalization(),
+        # tf.keras.layers.Conv2D(filters=11,
+        #                        kernel_size=(3, 3),
+        #                        activation='relu'),
+        # tf.keras.layers.Conv2D(filters=11,
+        #                        kernel_size=(3, 3),
+        #                        activation='relu'),
+        # tf.keras.layers.Conv2D(filters=11,
+        #                        kernel_size=(3, 3),
+        #                        activation='relu'),
         tf.keras.layers.Flatten(),
         tf.keras.layers.Dense(7, activation='softmax'),
     ])
@@ -106,7 +106,7 @@ def main():
     # print(model.summary())
 
     checkpoint = tf.keras.callbacks.ModelCheckpoint(
-        filepath=(REPO_DIR / "model/baseline_v2/weight/weights.{epoch:02d}-{val_accuracy:.2f}.h5"),
+        filepath=(REPO_DIR / "model/h5_format/baseline/weight/weights.{epoch:02d}-{val_accuracy:.2f}.h5"),
         monitor='val_accuracy',
         save_best_only=True,
         mode='max',
@@ -114,9 +114,10 @@ def main():
         save_freq='epoch'
     )
 
-    history = model.fit(train_ds, validation_data=val_ds, epochs=30, callbacks=[checkpoint], batch_size=100, verbose=1)
-    save_as_json(path=(REPO_DIR / f"metric/baseline_v2/history.json"), data=history.history)
-    model.save(REPO_DIR / "model/baseline_v2/model.h5")
+    history = model.fit(train_ds, validation_data=val_ds, epochs=2, callbacks=[checkpoint], batch_size=100, verbose=1)
+    save_as_json(path=(REPO_DIR / f"metric/baseline/history.json"), data=history.history)
+    model.save(REPO_DIR / "model/sv_format/saved_model/baseline_model")
+    model.save(REPO_DIR / "model/h5_format/baseline/model.h5")
 
 
 if __name__ == "__main__":

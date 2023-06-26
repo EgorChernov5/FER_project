@@ -117,8 +117,10 @@ async function sendFrame() {
     // Process the response, update the result
     if (response === 'None') {
         result['nothing'] = result['nothing'] + 1
+//        localStorage.setItem("result", JSON.stringify(result))
     } else {
         result[response] = result[response] + 1
+//        localStorage.setItem("result", JSON.stringify(result))
     }
 }
 
@@ -158,7 +160,7 @@ function getResult() {
                     ['Disgust', rec_res['disgust']],
                     ['Fear', rec_res['fear']],
                     ['Happy', rec_res['happy']],
-                    ['Neutral', rec_res['neural']],
+                    ['Neutral', rec_res['neutral']],
                     ['Sad', rec_res['sad']],
                     ['Surprise', rec_res['surprise']],
                     ['Not recognized', rec_res['nothing']],

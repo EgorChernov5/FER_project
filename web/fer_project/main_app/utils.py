@@ -1,12 +1,18 @@
-import tensorflow as tf
+import requests
+import os
+from dotenv import load_dotenv
+import json
 import cv2
 import base64
 from PIL import Image
 import numpy as np
 import io
+from pathlib import Path
 
 
-faceCascade = cv2.CascadeClassifier('static/model/haarcascade_frontalface_default.xml')
+PROJECT_DIR = Path(__file__).parent.parent
+load_dotenv()
+faceCascade = cv2.CascadeClassifier(str(PROJECT_DIR / 'static/model/haarcascade_frontalface_default.xml'))
 CLASS_NAMES = np.array(['angry', 'disgust', 'fear', 'happy', 'neutral', 'sad', 'surprise'])
 
 
@@ -21,7 +27,7 @@ def decode_image(b_image):
          Numpy array image.
     """
     img = io.BytesIO(base64.b64decode(b_image))
-    img = Image.open(img).convert('RGB')
+    img = Image.open(img).convert('L')
     return np.array(img)
 
 
@@ -35,24 +41,21 @@ def preprocess_image(image):
     Return:
         Cropped scaled and resized image or None.
     """
-    # Convert to grayscale for detection
-    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # Get the bounding box
-    bbox = faceCascade.detectMultiScale(gray_image,
+    bbox = faceCascade.detectMultiScale(image,
                                         scaleFactor=1.1,
                                         minNeighbors=5,
                                         minSize=(20, 20))
     if len(bbox):
         x, y, w, h = bbox[0]
-        # Convert to grayscale for classification
-        image = tf.image.rgb_to_grayscale(image)
         # Crop the image
-        image = image[y:(y + h), x:(x + w), :]
-        # Resize the image
-        image = tf.image.resize(image, [48, 48])
+        image = image[y:(y + h), x:(x + w)]
         # Scale the image
-        image = tf.cast(image, dtype=tf.float32) / tf.constant(256, dtype=tf.float32)
-        # Add batch size
+        image = image / 255.0
+        # Resize the image
+        image = cv2.resize(image, (48, 48), interpolation=cv2.INTER_AREA)
+        # Add channel`s number and batch size
+        image = image[:, :, np.newaxis]
         image = np.expand_dims(image, axis=0)
         return image
 
@@ -69,7 +72,9 @@ def get_predict(image):
     Return:
          Predict (str).
     """
-    model = tf.keras.models.load_model("static/model/model.h5")
-    y_pred = model.predict(tf.convert_to_tensor(image))
-    predict = CLASS_NAMES[np.argmax(y_pred[0])]
+    data = {"instances": image.tolist()}
+    data = json.dumps(data)
+    y_pred = requests.post(os.getenv('URL'), data=data)
+    y_pred = np.array(y_pred.json()['predictions'][0])
+    predict = CLASS_NAMES[np.argmax(y_pred)]
     return predict
