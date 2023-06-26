@@ -6,25 +6,25 @@ services:
     container_name: ts-ml-service
     restart: always
     ports:
-      - '8501:8501'
+      - "8501:8501"
     volumes:
       - ./ml/model/sv_format/saved_model:/saved_model
     command: tensorflow_model_server --rest_api_port=8501 --model_name=baseline_model --model_base_path=/saved_model
 
   web-service:
-    build: ./web
+    build:
+      context: ./web
     container_name: fer-web-service
     restart: always
+    ports:
+      - "8000:8000"
     env_file:
       - .env
-    ports:
-      - '8000:8000'
     environment:
       URL: ${URL}
     depends_on:
       - ml-service
     volumes:
-      - ./web:/app
-      - ./web/fer_project/static:/app/fer_project/static
-    command: python /app/fer_project/manage.py runserver localhost:8000
+      - ./web/fer_project:/app
+    command: python manage.py runserver 0.0.0.0:8000
 
