@@ -1,0 +1,5 @@
+[core]
+    analytics = false
+    remote = fer_storage
+['remote "fer_storage"']
+    url = C:\Users\krish\dvc_backup

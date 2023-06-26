@@ -1,0 +1,4 @@
+fer_project/main_app/migrations/
+fer_project/static/admin/
+fer_project/static/model/
+.env
