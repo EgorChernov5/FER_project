@@ -10,6 +10,8 @@ services:
     volumes:
       - ./ml/model/sv_format/saved_model:/saved_model
     command: tensorflow_model_server --rest_api_port=8501 --model_name=baseline_model --model_base_path=/saved_model
+    networks:
+      - network
 
   web-service:
     build:
@@ -27,4 +29,8 @@ services:
     volumes:
       - ./web/fer_project:/app
     command: python manage.py runserver 0.0.0.0:8000
+    networks:
+      - network
 
+networks:
+  network:
