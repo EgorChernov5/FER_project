@@ -1,9 +1,0 @@
-fer==22.5.0
-moviepy==1.0.3
-imageio==2.5.0
-tensorflow==2.11.0
-numpy
-pandas
-python-dotenv
-dvc
-matplotlib
