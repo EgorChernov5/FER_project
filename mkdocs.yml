@@ -1,0 +1,12 @@
+site_name: FER project
+site_author: Egor Chernov
+site_url: https://egorchernov5.github.io
+nav:
+  - Home: index.md
+  - Documentation:
+    - Model development: Model/model_dev.md
+    - Web-app development: Web/web_deb.md
+    - Packing in a Docker: Docker/docker_dev.md
+plugins: []
+theme:
+  name: gitbook
