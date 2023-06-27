@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<title>Packing in a Docker - FER project</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<meta name="generator" content="mkdocs-1.4.3, mkdocs-gitbook-1.0.7">
+<meta name="author" content="Egor Chernov">
+<link rel="shortcut icon" href="../../images/favicon.ico" type="image/x-icon">
+<meta name="HandheldFriendly" content="true"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta rel="next" href="" />
+<link href="../../css/style.min.css" rel="stylesheet"> 
+</head>
+
+<body>
+<div class="book">
+<div class="book-summary">
+
+<nav role="navigation">
+<ul class="summary">
+<li>
+<a href="../.." target="_blank" class="custom-link">FER project</a>
+</li>
+<li class="divider"></li>
+<li class="chapter" data-path="">
+<a href="../..">Home</a>
+<li class="header">Documentation</li>
+
+<li>
+<a href="../../Model/model_dev/" class="">Model development</a>
+</li>
+
+<li>
+<a href="../../Web/web_deb/" class="">Web-app development</a>
+</li>
+
+<li>
+<a href="./" class="active">Packing in a Docker</a>
+</li>
+
+<li class="divider"></li>
+
+
+
+<li><a href="http://www.mkdocs.org">
+Published with MkDocs
+</a></li>
+
+<li><a href="https://github.com/GitbookIO/theme-default">
+Theme by GitBook
+</a></li>
+</ul>
+
+</nav>
+
+</div> <!-- end of book-summary -->
+
+<div class="book-body">
+<div class="body-inner">
+<div class="book-header" role="navigation">
+
+<!-- Title -->
+<h1>
+<i class="fa fa-circle-o-notch fa-spin"></i>
+<a href="." ></a>
+</h1>
+
+</div> <!-- end of book-header -->
+
+<div class="page-wrapper" tabindex="-1" role="main">
+<div class="page-inner">
+
+<section class="normal markdown-section">
+
+
+
+<h2 id="packing-mvp-in-a-docker-container">Packing MVP in a Docker container</h2>
+<h3 id="the-following-steps-have-been-implemented-to-package-the-application-in-docker">The following steps have been implemented to package the application in Docker:</h3>
+<h4 id="a-dockerfile-file-was-created-in-the-application-folder">A Dockerfile file was created in the application folder</h4>
+<pre><code class="language-dockerfile">FROM python:3.10.7
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+EXPOSE 8000
+</code></pre>
+<p>Our image uses python:3.10.7, the commands "ENV PYTHONDONTWRITEBYTECODE=1", "ENV PYTHONUNBUFFERED=1" prohibit python from writing *.pyc files to disk and prohibit buffering stdout, stdin. We also copy all the packages and upload them to the image, after which we copy the project.</p>
+<h4 id="we-put-docker-composeyml-in-the-root-of-the-project">We put docker-compose.yml in the root of the project</h4>
+<pre><code class="language-dockerfile">version: '3.9'
+
+services:
+  ml-service:
+    image: tensorflow/serving:2.11.0
+    container_name: ts-ml-service
+    restart: always
+    ports:
+      - &quot;8501:8501&quot;
+    volumes:
+      - ./ml/model/sv_format/saved_model:/saved_model
+    command: tensorflow_model_server --rest_api_port=8501 --model_name=baseline_model --model_base_path=/saved_model
+    networks:
+      - network
+
+  web-service:
+    build:
+      context: ./web
+    container_name: fer-web-service
+    restart: always
+    ports:
+      - &quot;8000:8000&quot;
+    env_file:
+      - .env
+    environment:
+      URL: ${URL}
+    depends_on:
+      - ml-service
+    volumes:
+      - ./web/fer_project:/app
+    command: python manage.py runserver 0.0.0.0:8000
+    networks:
+      - network
+
+networks:
+  network:
+</code></pre>
+<p>Here we launch the image on which our model and our django project work, then we put them into the same network.</p>
+<p>To start, you need to run the following commands:</p>
+<blockquote>
+<p>docker-compose build</p>
+<p>docker-compose up</p>
+</blockquote>
+<p>Now our app is available at - <a href="http:localhost:8000">http:localhost:8000</a>, and API`s model - <a href="http://ts-ml-service:8501/v1/models/fer_model:predict">http://ts-ml-service:8501/v1/models/fer_model:predict</a>.</p>
+
+
+</section>
+
+</div> <!-- end of page-inner -->
+</div> <!-- end of page-wrapper -->
+
+</div> <!-- end of body-inner -->
+
+</div> <!-- end of book-body -->
+<script src="../../js/main.js"></script>
+<script src="../../js/gitbook.min.js"></script>
+<script src="../../js/theme.min.js"></script>
+</body>
+</html>

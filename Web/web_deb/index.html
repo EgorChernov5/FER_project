@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<title>Web-app development - FER project</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<meta name="generator" content="mkdocs-1.4.3, mkdocs-gitbook-1.0.7">
+<meta name="author" content="Egor Chernov">
+<link rel="shortcut icon" href="../../images/favicon.ico" type="image/x-icon">
+<meta name="HandheldFriendly" content="true"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta rel="next" href="" />
+<link href="../../css/style.min.css" rel="stylesheet"> 
+</head>
+
+<body>
+<div class="book">
+<div class="book-summary">
+
+<nav role="navigation">
+<ul class="summary">
+<li>
+<a href="../.." target="_blank" class="custom-link">FER project</a>
+</li>
+<li class="divider"></li>
+<li class="chapter" data-path="">
+<a href="../..">Home</a>
+<li class="header">Documentation</li>
+
+<li>
+<a href="../../Model/model_dev/" class="">Model development</a>
+</li>
+
+<li>
+<a href="./" class="active">Web-app development</a>
+</li>
+
+<li>
+<a href="../../Docker/docker_dev/" class="">Packing in a Docker</a>
+</li>
+
+<li class="divider"></li>
+
+
+
+<li><a href="http://www.mkdocs.org">
+Published with MkDocs
+</a></li>
+
+<li><a href="https://github.com/GitbookIO/theme-default">
+Theme by GitBook
+</a></li>
+</ul>
+
+</nav>
+
+</div> <!-- end of book-summary -->
+
+<div class="book-body">
+<div class="body-inner">
+<div class="book-header" role="navigation">
+
+<!-- Title -->
+<h1>
+<i class="fa fa-circle-o-notch fa-spin"></i>
+<a href="." ></a>
+</h1>
+
+</div> <!-- end of book-header -->
+
+<div class="page-wrapper" tabindex="-1" role="main">
+<div class="page-inner">
+
+<section class="normal markdown-section">
+
+
+
+<h2 id="web-application-development">Web Application Development:</h2>
+<p>To create a web application, we use the Django framework.</p>
+<p><strong>The steps of this application are as follows:</strong></p>
+<ol>
+<li>The user gets to the main page with a greeting and a warning;</li>
+<li>Go to a page with an interface for recording a person from a front-facing webcam;</li>
+<li>At the time of recording, the frames are sent to the server where our emotion recognition model works;</li>
+<li>After we get the result and write it down;</li>
+<li>When the recording stops and the user wants to see the result, he goes to the next page;</li>
+<li>Output of the result on a graph with notation.</li>
+</ol>
+<p>The application is packaged in an image, in order for the application to work, it is necessary to launch a container with TensorFlow Serving on which the machine learning model runs.</p>
+<p>After the launch, the web-app will be available at - <a href="http:localhost:8000">http:localhost:8000</a>.</p>
+
+
+</section>
+
+</div> <!-- end of page-inner -->
+</div> <!-- end of page-wrapper -->
+
+</div> <!-- end of body-inner -->
+
+</div> <!-- end of book-body -->
+<script src="../../js/main.js"></script>
+<script src="../../js/gitbook.min.js"></script>
+<script src="../../js/theme.min.js"></script>
+</body>
+</html>

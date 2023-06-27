@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<title>Model development - FER project</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<meta name="generator" content="mkdocs-1.4.3, mkdocs-gitbook-1.0.7">
+<meta name="author" content="Egor Chernov">
+<link rel="shortcut icon" href="../../images/favicon.ico" type="image/x-icon">
+<meta name="HandheldFriendly" content="true"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta rel="next" href="" />
+<link href="../../css/style.min.css" rel="stylesheet"> 
+</head>
+
+<body>
+<div class="book">
+<div class="book-summary">
+
+<nav role="navigation">
+<ul class="summary">
+<li>
+<a href="../.." target="_blank" class="custom-link">FER project</a>
+</li>
+<li class="divider"></li>
+<li class="chapter" data-path="">
+<a href="../..">Home</a>
+<li class="header">Documentation</li>
+
+<li>
+<a href="./" class="active">Model development</a>
+</li>
+
+<li>
+<a href="../../Web/web_deb/" class="">Web-app development</a>
+</li>
+
+<li>
+<a href="../../Docker/docker_dev/" class="">Packing in a Docker</a>
+</li>
+
+<li class="divider"></li>
+
+
+
+<li><a href="http://www.mkdocs.org">
+Published with MkDocs
+</a></li>
+
+<li><a href="https://github.com/GitbookIO/theme-default">
+Theme by GitBook
+</a></li>
+</ul>
+
+</nav>
+
+</div> <!-- end of book-summary -->
+
+<div class="book-body">
+<div class="body-inner">
+<div class="book-header" role="navigation">
+
+<!-- Title -->
+<h1>
+<i class="fa fa-circle-o-notch fa-spin"></i>
+<a href="." ></a>
+</h1>
+
+</div> <!-- end of book-header -->
+
+<div class="page-wrapper" tabindex="-1" role="main">
+<div class="page-inner">
+
+<section class="normal markdown-section">
+
+
+
+<h2 id="stages-of-development-of-a-machine-learning-model-for-recognizing-human-emotions-to-improve-the-gaming-industry">Stages of development of a machine learning model for recognizing human emotions to improve the gaming industry:</h2>
+<h3 id="_1">Постановка цели</h3>
+<p>Collecting statistical data on a person's emotional state can be useful for assessing the emotional appeal of the game and identifying strengths and weaknesses.
+Developers will be able to conduct more targeted testing and make improvements to create games that evoke strong emotions and satisfaction among players.</p>
+<h3 id="data-collection">Data collection</h3>
+<p><strong>The training data was taken from the Kaggle website:</strong></p>
+<ul>
+<li><a href="https://www.kaggle.com/datasets/ananthu017/emotion-detection-fer">Emotion Detection</a></li>
+<li><a href="https://www.kaggle.com/datasets/msambare/fer2013">FER-2013</a>  </li>
+<li><a href="https://www.kaggle.com/datasets/juniorbueno/rating-opencv-emotion-images">Rating OpenCV Emotion Images</a>  </li>
+<li><a href="https://www.kaggle.com/datasets/sudarshanvaidya/random-images-for-face-emotion-recognition">Natural Human Face Images for Emotion Recognition</a>  </li>
+<li><a href="https://www.kaggle.com/datasets/kmirfan/micro-expressions">Micro_Expressions</a>  </li>
+<li><a href="https://www.kaggle.com/datasets/sudarshanvaidya/corrective-reannotation-of-fer-ck-kdef">Corrective re-annotation of FER - CK+ - KDEF</a>  </li>
+</ul>
+<h3 id="data-preprocessing">Data preprocessing</h3>
+<p>Repositories have a different structure, so the functionality was implemented (utils.unzip_archive.py ) to unzip data into a single folder structure. Next, we bring the photos to a single format:</p>
+<ul>
+<li>1 color channel;</li>
+<li>shape 48x48;</li>
+<li>the formation of approximately the same number of photos of samples.</li>
+</ul>
+<h3 id="model-selection">Model Selection</h3>
+<p>ДA simple convolutional neural network with 5 convolution layers and ReLU activation functions was implemented in baseline. For implementation, we use the TensorFlow framework.</p>
+<p><strong>Structure:</strong></p>
+<pre><code class="language-python">tf.keras.Sequential([
+        tf.keras.layers.Conv2D(filters=11,
+                               kernel_size=(3, 3),
+                               activation='relu',
+                               input_shape=(48, 48, 1)),
+        tf.keras.layers.Conv2D(filters=11,
+                               kernel_size=(3, 3),
+                               activation='relu'),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Conv2D(filters=11,
+                               kernel_size=(3, 3),
+                               activation='relu'),
+        tf.keras.layers.Conv2D(filters=11,
+                               kernel_size=(3, 3),
+                               activation='relu'),
+        tf.keras.layers.Conv2D(filters=11,
+                               kernel_size=(3, 3),
+                               activation='relu'),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(7, activation='softmax'),
+    ])
+</code></pre>
+<h3 id="model-training">Model Training</h3>
+<p>We use the prepared data for training. We divide the data into training, validation and test samples in a ratio of 60x20x20.</p>
+<p><strong>Model parameters:</strong></p>
+<pre><code class="language-python">model.compile(
+        optimizer=tf.keras.optimizers.Adam(learning_rate=1e-3),
+        loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+        metrics=['accuracy']
+    )
+
+EPOCHS = 30
+batch_size=100
+</code></pre>
+<p><strong>When learning, we get the following values:</strong></p>
+<ul>
+<li>Train acc: 0.916867196559906</li>
+<li>Val acc: 0.7075471878051758</li>
+</ul>
+<h3 id="evaluation-and-improvement-of-the-model">Evaluation and improvement of the model</h3>
+<p>The next stage is the visualization of graphs (loss, accuracy, confusion matrix), evaluation of the model based on test data.</p>
+<p>Based on the test data, we received accuracy 0.7075471878051758, this does not suit us.</p>
+<p>Based on the estimated data, we see that we have a fairly large bias on the train sample - this suits us, but when we look at the accuracy of our validation sample, we notice that we have a large variance of ~ 20%.</p>
+<p>There are several ways we can fix this:</p>
+<ul>
+<li>Apply regularization;</li>
+<li>Increase the amount of data;</li>
+<li>Change the model structure.</li>
+</ul>
+<h3 id="implementation-of-the-model">Implementation of the model</h3>
+<p>After successful evaluation and improvement of the model, we proceed to its implementation. We create an API so that it can interact with other systems using TenzorFlow Serving. We put our model in the image and run the image.</p>
+<p>The model can be accessed at the following address - <a href="http://ts-ml-service:8501/v1/models/fer_model:predict">http://ts-ml-service:8501/v1/models/fer_model:predict</a>.</p>
+<p>The transmitted data should look like this:</p>
+<pre><code class="language-json">{
+  &quot;instances&quot;: np.array(shape=[1, 48, 48, 1])
+}
+</code></pre>
+
+
+</section>
+
+</div> <!-- end of page-inner -->
+</div> <!-- end of page-wrapper -->
+
+</div> <!-- end of body-inner -->
+
+</div> <!-- end of book-body -->
+<script src="../../js/main.js"></script>
+<script src="../../js/gitbook.min.js"></script>
+<script src="../../js/theme.min.js"></script>
+</body>
+</html>
