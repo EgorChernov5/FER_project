@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 from ml.util.util import open_json
+from ml.src.train import get_path, process_path
 
 REPO_DIR = Path(__file__).parent.parent
 CLASS_NAMES = np.array(['angry', 'disgust', 'fear', 'happy', 'neutral', 'sad', 'surprise'])
@@ -194,11 +195,11 @@ def plot_history(history, save=False, path=None):
 
 
 def main():
-    # test_ds = get_path(REPO_DIR / "data/prepared/val.csv")
-    # test_ds = (test_ds
-    #            .map(process_path, num_parallel_calls=AUTOTUNE)
-    #            .batch(1000, num_parallel_calls=AUTOTUNE)
-    #            .prefetch(buffer_size=AUTOTUNE))
+    train_ds = get_path(REPO_DIR / "data/prepared/train.csv")
+    # train_ds = (train_ds
+    #             .map(process_path, num_parallel_calls=AUTOTUNE)
+    #             .batch(1000, num_parallel_calls=AUTOTUNE)
+    #             .prefetch(buffer_size=AUTOTUNE))
     # display_batch(train_ds)
 
     # img, _ = next(iter(test_ds))
@@ -207,8 +208,8 @@ def main():
     # model = tf.keras.models.load_model(REPO_DIR / "model/baseline_v2/model.h5")
 
     # Loss, accuracy
-    history = open_json(REPO_DIR / f"metric/baseline_v2/history.json")
-    plot_history(history)
+    # history = open_json(REPO_DIR / f"metric/baseline_v2/history.json")
+    # plot_history(history)
 
     # tf.keras.utils.plot_model(model, to_file=(REPO_DIR / "model/baseline_v2/structure.png"),
     #                           expand_nested=True, show_shapes=True)

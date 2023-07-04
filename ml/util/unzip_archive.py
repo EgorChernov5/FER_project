@@ -34,7 +34,7 @@ FOLDERS_TO_LABELS = {
 
 
 def display_raw_samples(checked_sample='test'):
-    samples = os.listdir(DATASET_PATH)
+    samples = [sample for sample in os.listdir(DATASET_PATH) if os.path.isdir(f"{DATASET_PATH}/{sample}")]
     labels = os.listdir(f"{DATASET_PATH}/train")
     labels_counts = dict.fromkeys(labels, 0)
     sample_labels_counts = dict.fromkeys(labels, 0)
@@ -53,7 +53,7 @@ def display_archive_samples(archive_path, targets_count):
     with zipfile.ZipFile(archive_path, 'r') as z:
         label_names = list(set([os.path.dirname(frame) for frame in z.namelist()]))
         label_names.sort()
-        print(f"Archive {archive_name}:")
+        print(f"Archive {archive_path.split('/')[0]}:")
         # counter for samples
         label_counts = []
         for label_name in label_names:
@@ -143,8 +143,8 @@ def unzip_archive(source, destination):
 
 
 if __name__ == "__main__":
-    # display_raw_samples()
-    archives_names = os.listdir(ARCHIVE_PATH)
-    for archive_name in archives_names:
-        # display_archive_samples(f"{ARCHIVE_PATH}/{archive_name}", targets_count=7)
-        unzip_archive(f"{ARCHIVE_PATH}/{archive_name}", DATASET_PATH)
+    display_raw_samples()
+    # archives_names = os.listdir(ARCHIVE_PATH)
+    # for archive_name in archives_names:
+    #     # display_archive_samples(f"{ARCHIVE_PATH}/{archive_name}", targets_count=7)
+    #     unzip_archive(f"{ARCHIVE_PATH}/{archive_name}", DATASET_PATH)

@@ -52,10 +52,11 @@ def process_path(file_path):
     return img, label
 
 
-def configure_for_performance(ds, shuffle=True, reshuffle=False, batch_size=1000):
-    ds = ds.cache()
-    if shuffle:
-        ds = ds.shuffle(buffer_size=1024, reshuffle_each_iteration=reshuffle)
+def configure_for_performance(ds, test=False, reshuffle=False, batch_size=1000):
+    if not test:
+        ds = (ds
+              .cache()
+              .shuffle(buffer_size=1024, reshuffle_each_iteration=reshuffle))
 
     ds = (ds
           .batch(batch_size, num_parallel_calls=AUTOTUNE)
@@ -94,7 +95,7 @@ def main():
 
     val_ds = get_path(REPO_DIR / "data/prepared/val.csv")
     val_ds = val_ds.map(process_path, num_parallel_calls=AUTOTUNE)
-    val_ds = configure_for_performance(val_ds, shuffle=False, batch_size=1000)
+    val_ds = configure_for_performance(val_ds, test=True, batch_size=1000)
 
     model = create_model()
     model.compile(
