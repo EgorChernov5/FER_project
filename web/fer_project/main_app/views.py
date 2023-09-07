@@ -26,7 +26,7 @@ def predict(request):
             img = preprocess_image(img)
             if img is not None:
                 response = get_predict(img)
-        except:
-            print("Error")
+        except Exception as error:
+            print("An exception occurred:", error)
 
     return HttpResponse(response)
