@@ -3,13 +3,27 @@ import numpy as np
 from pathlib import Path
 import matplotlib.pyplot as plt
 import seaborn as sns
+import math
 
-from ml.util.util import open_json
+from ml.util.util import open_json, save_as_json
+from ml.src.train import prepare
 
 REPO_DIR = Path(__file__).parent.parent
 CLASS_NAMES = np.array(['angry', 'disgust', 'fear', 'happy', 'neutral', 'sad', 'surprise'])
 AUTOTUNE = tf.data.experimental.AUTOTUNE
 tf.random.set_seed(5)
+sns.set(style="whitegrid")
+
+
+def display_distribution(ds):
+    colors = sns.color_palette("deep")
+    label_counter = np.zeros(7)
+    for _, labels in ds:
+        for label in labels:
+            label_counter[label] = label_counter[label] + 1
+
+    plt.bar(CLASS_NAMES, label_counter, color=colors)
+    plt.show()
 
 
 def display_batch(ds):
@@ -17,22 +31,22 @@ def display_batch(ds):
     plt.figure(figsize=(8, 6))
     for i in range(9):
         ax = plt.subplot(3, 3, i + 1)
-        plt.imshow(image_batch[i].numpy().astype("uint8"))
+        plt.imshow(image_batch[i], cmap='gray')
         label = label_batch[i]
         plt.title(CLASS_NAMES[label])
         plt.axis("off")
+
     plt.show()
 
 
-def display_conv_filter(filters, channel, name='layers_filter', save=False):
+def display_conv_filter(filters, channel, save_path=None):
     """
     Display Conv2D filters.
 
     Args:
         filters: filters with shape: [kernel_height, kernel_width, input_channel, output_channel]
         channel: index of channel
-        name: name file
-        save: save plot or not
+        save_path: save plot or not
     """
     print(
         f'Kernel size - {filters.shape[:2]}; '
@@ -41,42 +55,47 @@ def display_conv_filter(filters, channel, name='layers_filter', save=False):
     )
     fig = plt.figure(figsize=(8, 6))
     n_filters = filters.shape[-1]
-    rows = int(n_filters / 2)
-    columns = n_filters - rows
+    rows = int(math.sqrt(n_filters))
+    columns = int(math.ceil(n_filters / rows))
     for i in range(n_filters):
         f = filters[:, :, :, i]
-        fig = plt.subplot(rows, columns, i + 1)
-        fig.set_xticks([])
-        fig.set_yticks([])
-        plt.imshow(f[:, :, channel], cmap='gray')
+        ax = fig.add_subplot(rows, columns, i + 1)
+        plt.xticks([])
+        plt.yticks([])
+        ax.imshow(f[:, :, channel], cmap='gray')
 
-    if save:
-        plt.savefig(REPO_DIR / f"visualize/{name}_{channel}.png")
+    if save_path:
+        plt.savefig(save_path)
+
     plt.show()
 
 
-def display_conv_output(model, img, n, save=False):
+def display_conv_output(model, img, n, save_path=None):
     conv_layer = []
     for layer in model.layers:
         if "conv" in layer.name:
             conv_layer.append(layer.output)
+
     short_model = tf.keras.Model(inputs=model.inputs, outputs=conv_layer[:n])
     # Get last output
     outputs = short_model(img)[-1]
     if len(conv_layer[:n]) == 1:
         outputs = tf.expand_dims(outputs, axis=0)
+
     fig = plt.figure(figsize=(8, 6))
     n_channels = outputs.shape[-1]
-    rows = int(n_channels / 2)
-    columns = n_channels - rows
+    rows = int(math.sqrt(n_channels))
+    columns = int(math.ceil(n_channels / rows))
     for i in range(n_channels):
-        fig = plt.subplot(rows, columns, i + 1)
-        fig.set_xticks([])
-        fig.set_yticks([])
-        plt.imshow(outputs[0, :, :, i], cmap='gray')
+        ax = fig.add_subplot(rows, columns, i + 1)
+        plt.xticks([])
+        plt.yticks([])
+        plt.ylabel(i + 1)
+        ax.imshow(outputs[0, :, :, i], cmap='gray')
 
-    if save:
-        plt.savefig(REPO_DIR / f"metric/baseline/{short_model.layers[-1].name}.png")
+    if save_path:
+        plt.savefig(save_path)
+
     plt.show()
 
 
@@ -101,7 +120,7 @@ def get_actual_predicted_labels(model, dataset):
     return actual, predicted
 
 
-def plot_confusion_matrix(actual, predicted, labels, ds_type, save=False):
+def plot_confusion_matrix(actual, predicted, labels, ds_type, save_path=None):
     cm = tf.math.confusion_matrix(actual, predicted)
     ax = sns.heatmap(cm, annot=True, fmt='g')
     sns.set(rc={'figure.figsize': (12, 12)})
@@ -113,8 +132,8 @@ def plot_confusion_matrix(actual, predicted, labels, ds_type, save=False):
     plt.yticks(rotation=0)
     ax.xaxis.set_ticklabels(labels)
     ax.yaxis.set_ticklabels(labels)
-    if save:
-        plt.savefig(REPO_DIR / "metric/baseline/confusion_matrix.png")
+    if save_path:
+        plt.savefig(save_path)
     plt.show()
 
 
@@ -151,14 +170,13 @@ def calculate_classification_metrics(y_actual, y_pred, labels):
     return precision, recall
 
 
-def plot_history(history, save=False, path=None):
+def plot_history(history, save_path=None):
     """
     Plotting training and validation learning curves.
 
     Args:
         history: model history with all the metric measures
-        save: save the model or not
-        path: where will save the plot
+        save_path: where will save the plot
     """
     fig, (ax1, ax2) = plt.subplots(2)
 
@@ -187,44 +205,52 @@ def plot_history(history, save=False, path=None):
     ax2.set_xlabel('Epoch')
     ax2.legend(['Train', 'Validation'])
 
-    if save:
-        plt.savefig(path)
+    if save_path:
+        plt.savefig(save_path)
 
     plt.show()
 
 
 def main():
-    # test_ds = get_path(REPO_DIR / "data/prepared/val.csv")
-    # test_ds = (test_ds
-    #            .map(process_path, num_parallel_calls=AUTOTUNE)
-    #            .batch(1000, num_parallel_calls=AUTOTUNE)
-    #            .prefetch(buffer_size=AUTOTUNE))
-    # display_batch(train_ds)
+    test_ds = prepare(source=REPO_DIR / "data/prepared/test.csv", batch_size=1024)
 
-    # img, _ = next(iter(test_ds))
-    # img = tf.expand_dims(img[0], axis=0)
+    # Display data
+    # display_batch(test_ds)
 
-    # model = tf.keras.models.load_model(REPO_DIR / "model/baseline_v2/model.h5")
+    # Display dataset distribution
+    # display_distribution(test_ds)
 
-    # Loss, accuracy
-    history = open_json(REPO_DIR / f"metric/baseline_v2/history.json")
-    plot_history(history)
+    model = tf.keras.models.load_model(REPO_DIR / "model/h5_format/baseline_v1/model.h5")
 
+    # Compute loss, accuracy
+    history = open_json(REPO_DIR / f"metric/baseline_v1/history.json")
+    plot_history(history, REPO_DIR / f"metric/baseline_v1/history.jpg")
+
+    # Display model architecture
     # tf.keras.utils.plot_model(model, to_file=(REPO_DIR / "model/baseline_v2/structure.png"),
     #                           expand_nested=True, show_shapes=True)
     # print(model.summary())
 
-    # actual, predicted = get_actual_predicted_labels(model, test_ds)
-    # plot_confusion_matrix(actual, predicted, CLASS_NAMES, 'test', save=True)
+    # Display confusion matrix
+    actual, predicted = get_actual_predicted_labels(model, test_ds)
+    plot_confusion_matrix(actual, predicted, CLASS_NAMES,
+                          'test', save_path=(REPO_DIR / "metric/baseline_v1/confusion_matrix.png"))
 
-    # precision, recall = calculate_classification_metrics(actual, predicted, CLASS_NAMES)
-    # save_as_json(path=(REPO_DIR / "metric/baseline_v2/test_precision.h5"), data=precision)
-    # save_as_json(path=(REPO_DIR / "metric/baseline_v2/test_recall.h5"), data=recall)
+    # Compute  precision, recall
+    precision, recall = calculate_classification_metrics(actual, predicted, CLASS_NAMES)
+    save_as_json(path=(REPO_DIR / "metric/baseline_v1/test_precision.json"), data=precision)
+    save_as_json(path=(REPO_DIR / "metric/baseline_v1/test_recall.json"), data=recall)
 
-    # model.load_weights(REPO_DIR / "model/baseline_v2/weight/weights.27-0.78.h5")
-    # display_conv_filter(filters=model.layers[4].get_weights()[0], channel=0)
+    # Display conv filters
+    # model.load_weights(REPO_DIR / "model/h5_format/baseline_v3/weight/weights.21-0.64.h5")
+    # display_conv_filter(filters=model.layers[9]  # Get specific conv layer
+    #                     .get_weights()[0],  # Get weights without bias
+    #                     channel=0)
 
-    # display_conv_output(model, img, 2)
+    # Display output after using conv filter
+    img = next(iter(test_ds))[0][0]
+    img = np.expand_dims(img, axis=0)
+    display_conv_output(model, img, 6, save_path=(REPO_DIR / 'metric/baseline_v1/6_conv_output.jpg'))
 
 
 if __name__ == '__main__':

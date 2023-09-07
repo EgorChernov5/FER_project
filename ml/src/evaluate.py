@@ -1,7 +1,8 @@
 import tensorflow as tf
 import numpy as np
 from pathlib import Path
-from train import get_path, process_path
+
+from train import prepare
 from ml.util.util import save_as_json
 
 
@@ -12,17 +13,13 @@ tf.random.set_seed(5)
 
 
 def main():
-    test_ds = get_path(REPO_DIR / "data/prepared/val.csv")
-    test_ds = (test_ds
-               .map(process_path, num_parallel_calls=AUTOTUNE)
-               .batch(100, num_parallel_calls=AUTOTUNE)
-               .prefetch(buffer_size=AUTOTUNE))
+    test_ds = prepare(source=REPO_DIR / "data/prepared/test.csv", batch_size=1024)
 
-    model = tf.keras.models.load_model(REPO_DIR / "model/baseline_v2/model.h5")
+    model = tf.keras.models.load_model(REPO_DIR / "model/h5_format/baseline_v1/model.h5")
 
     test_loss, test_acc = model.evaluate(test_ds, verbose=2)
-    save_as_json(path=(REPO_DIR / "metric/baseline_v2/test_loss.json"), data=test_loss)
-    save_as_json(path=(REPO_DIR / "metric/baseline_v2/test_accuracy.json"), data=test_acc)
+    save_as_json(path=(REPO_DIR / "metric/baseline_v1/test_loss.json"), data=test_loss)
+    save_as_json(path=(REPO_DIR / "metric/baseline_v1/test_accuracy.json"), data=test_acc)
 
 
 if __name__ == '__main__':
