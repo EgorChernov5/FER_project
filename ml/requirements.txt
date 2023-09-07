@@ -6,3 +6,4 @@ matplotlib==3.7.1
 
 opencv-python==4.7.0.72
 fer==22.5.0
+dvc==3.18.0
