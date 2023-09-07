@@ -20,9 +20,10 @@
 **Для запуска проекта необходимо сделать следующее:**
 1. Стянуть данный репозиторий;
 2. Сохранить в папку "./ml/model/sv_format/saved_model" модель;
-3. Добавить в корневую папку файл ".env" (прописать URL=http://localhost:model_port/v1/models/model_name:predict);
-4. В папке репозитория открыть терминал;
-5. Запустить две команды:
+3. Скачать и переместить в папку модель из библиотеки CV2 "haarcascade_frontalface_default.xml";
+4. Добавить в корневую папку файл ".env" (прописать URL=http://<container_name>:<model_port>/v1/models/<model_name>:predict);
+5. В папке репозитория открыть терминал;
+6. Запустить две команды:
     > docker-compose build
 
     > docker-compose up
